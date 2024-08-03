@@ -26,7 +26,6 @@ public class InterestCoinController {
         return coinInfoService.getCoindData();
     }
 
-
     /*
      * WehClient 사용 post 전체데이터 호출하고 테이블에 저장(수정필요)
      * */
@@ -34,6 +33,7 @@ public class InterestCoinController {
     public Mono<Void> saveCoinInfo(){
         return coinInfoService.saveCoinDate();
     }
+
 
     /*
      * WehClient selected 코인 최신 거래 데이터 저장(테스트용)
@@ -44,25 +44,14 @@ public class InterestCoinController {
     }
 
 
-
-
-
     /*
-     * 빗썸 Open API를 통해 받아온 코인 데이터 저장
+     * 관심있는 코인 데이터 모두 불러오기
      * */
-    @PostMapping("/save-coin")
-//    @ResponseBody
-    public void saveCoinInfo(@RequestBody InterestCoinDto interestCoinDto){
-        coinInfoService.insertCoinInfo(interestCoinDto);
+    @GetMapping("/getSelectedAll-coin")
+    public List<InterestCoinDto> getSelectedCoinInfoAll(){
+        return coinInfoService.getAllInterestSelectedCoinData();
     }
 
-    /*
-     * 코인 데이터 모두 불러오기
-     * */
-    @GetMapping("/getAll-coin")
-    public List<InterestCoinDto> getCoinInfoAll(){
-        return coinInfoService.getAllInterestCoinData();
-    }
 
     /*
      * 관심있는 코인 데이터 선택/취소
@@ -73,13 +62,31 @@ public class InterestCoinController {
         coinInfoService.updateInterestCoinData(interestCoinDto);
     }
 
+
+
+
+
+
     /*
-     * 관심있는 코인 데이터 모두 불러오기
+     * 빗썸 Open API를 통해 받아온 코인 데이터 저장
      * */
-    @GetMapping("/getSelectedAll-coin")
-    public List<InterestCoinDto> getSelectedCoinInfoAll(){
-        return coinInfoService.getAllInterestSelectedCoinData();
+//    @PostMapping("/save-coin")
+////    @ResponseBody
+//    public void saveCoinInfo(@RequestBody InterestCoinDto interestCoinDto){
+//        coinInfoService.insertCoinInfo(interestCoinDto);
+//    }
+
+    /*
+     * 코인 데이터 모두 불러오기
+     * */
+    @GetMapping("/getAll-coin")
+    public List<InterestCoinDto> getCoinInfoAll(){
+        return coinInfoService.getAllInterestCoinData();
     }
+
+
+
+
 
 
 }

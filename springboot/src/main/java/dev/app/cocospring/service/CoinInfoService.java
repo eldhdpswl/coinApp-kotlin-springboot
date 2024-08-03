@@ -1,5 +1,6 @@
 package dev.app.cocospring.service;
 
+import dev.app.cocospring.Util.DateUtil;
 import dev.app.cocospring.dto.GetCoinInfo;
 import dev.app.cocospring.dto.InterestCoinDto;
 import dev.app.cocospring.entity.InterestCoinEntity;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,7 +41,9 @@ public class CoinInfoService {
 //        this.coinInfoRepository = coinInfoRepository;
 //    }
 
-
+    /*
+    * webClient 코인 전체데이터 호출
+    * */
     public Mono<GetCoinInfo> getCoindData() {
         return webClient.get()
                 .uri("/public/ticker/ALL")
@@ -80,11 +84,10 @@ public class CoinInfoService {
                 .bodyToMono(Map.class)
                 .flatMap(response ->{
                     List<Map<String, String>> dataList = (List<Map<String, String>>) response.get("data");
+                    Map<String, String> recentData = dataList.get(0); // 최신 거래 데이터
 
-                    if (dataList != null && !dataList.isEmpty()) {
-                        Map<String, String> recentData = dataList.get(0); // 최신 거래 데이터
-                        Date now = new Date();
-                        SelectedCoinPriceEntity entity = new SelectedCoinPriceEntity();
+                    SelectedCoinPriceEntity entity = new SelectedCoinPriceEntity();
+                    try{
                         entity.selectedCoinPrice(
                                 null,
                                 coinName,
@@ -93,13 +96,15 @@ public class CoinInfoService {
                                 recentData.get("units_traded"),
                                 recentData.get("price"),
                                 recentData.get("total"),
-                                now
+                                DateUtil.convertStringToDate(DateUtil.getCurrentTimestamp())
                         );
-                        selectedCoinPriceRepository.save(entity);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        return Mono.error(e);
                     }
+                    selectedCoinPriceRepository.save(entity);
                     return Mono.empty();
                 });
-
     }
 
 
