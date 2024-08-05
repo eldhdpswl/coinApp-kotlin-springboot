@@ -18,7 +18,7 @@ public class InterestCoinController {
     }
 
     /*
-     * WehClient 사용, 전체데이터 호출(테스트용)
+     * WebClient 사용, 전체데이터 호출(테스트용)
      * */
     @GetMapping("/webclient-test")
     @ResponseBody
@@ -27,20 +27,28 @@ public class InterestCoinController {
     }
 
     /*
-     * WehClient 사용 post 전체데이터 호출하고 테이블에 저장(수정필요)
+     * WebClient 사용 post 전체데이터 호출하고 테이블에 저장(수정필요)
      * */
-    @PostMapping("/webclient-testPost")
+    @PostMapping("/webclient-saveCoinInfo")
     public Mono<Void> saveCoinInfo(){
         return coinInfoService.saveCoinDate();
     }
 
 
     /*
-     * WehClient selected 코인 최신 거래 데이터 저장(테스트용)
+     * WebClient selected 코인 최신 거래 데이터 저장(테스트용)
      * */
     @PostMapping("/webclient-testSelectedPost/{coinName}")
-    public Mono<Void> SaveSelectedCoinInfo(@PathVariable String coinName){
+    public Mono<Void> selectedCoinInfo(@PathVariable String coinName){
         return coinInfoService.selectedCoinData(coinName);
+    }
+
+    /*
+    * WebClient selected 코인 전체 데이터 최근 거래 내역 저장
+    * */
+    @PostMapping("/webclient-saveSelectedCoinPrice")
+    public Mono<Void> saveSelectedCoinPrice(){
+        return coinInfoService.saveSelectedCoinData();
     }
 
 

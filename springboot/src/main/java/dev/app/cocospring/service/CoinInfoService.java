@@ -8,6 +8,7 @@ import dev.app.cocospring.entity.SelectedCoinPriceEntity;
 import dev.app.cocospring.repository.CoinInfoRepository;
 import dev.app.cocospring.repository.SelectedCoinPriceRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 //@RequiredArgsConstructor
 @Transactional
 public class CoinInfoService {
@@ -78,11 +80,14 @@ public class CoinInfoService {
      * */
     public Mono<Void> selectedCoinData(String coinName){
         String url = "public/transaction_history/" + coinName + "_KRW";
+        log.info("coinName : " + coinName);
+
         return webClient.get()
                 .uri(url)
                 .retrieve()
                 .bodyToMono(Map.class)
                 .flatMap(response ->{
+                    // 코인 거래 데이터 가져와서 List로 담기
                     List<Map<String, String>> dataList = (List<Map<String, String>>) response.get("data");
                     Map<String, String> recentData = dataList.get(0); // 최신 거래 데이터
 
@@ -105,6 +110,21 @@ public class CoinInfoService {
                     selectedCoinPriceRepository.save(entity);
                     return Mono.empty();
                 });
+    }
+
+    /*
+     * webClient Selected 코인 데이터를 모두 불러와서 최신 거래 데이터 저장
+     * */
+    public Mono<Void> saveSelectedCoinData(){
+        List<InterestCoinDto> interestCoinDtoList = getAllInterestSelectedCoinData(); // selected True 데이터 호출
+        if (interestCoinDtoList != null && !interestCoinDtoList.isEmpty()) {
+            for (InterestCoinDto interestCoinDto : interestCoinDtoList) {
+                selectedCoinData(interestCoinDto.getCoin_name());
+                log.info("saveSelectedCoinData interestCoinDto.getCoin_name() : " + interestCoinDto.getCoin_name());
+            }
+        }
+        return Mono.empty();
+
     }
 
 
