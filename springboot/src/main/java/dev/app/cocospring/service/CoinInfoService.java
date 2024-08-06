@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.text.ParseException;
@@ -107,8 +108,11 @@ public class CoinInfoService {
                         e.printStackTrace();
                         return Mono.error(e);
                     }
+                    log.info("Saving entity: " + entity);
                     selectedCoinPriceRepository.save(entity);
+
                     return Mono.empty();
+
                 });
     }
 
@@ -118,13 +122,11 @@ public class CoinInfoService {
     public Mono<Void> saveSelectedCoinData(){
         List<InterestCoinDto> interestCoinDtoList = getAllInterestSelectedCoinData(); // selected True 데이터 호출
         if (interestCoinDtoList != null && !interestCoinDtoList.isEmpty()) {
-            for (InterestCoinDto interestCoinDto : interestCoinDtoList) {
-                selectedCoinData(interestCoinDto.getCoin_name());
-                log.info("saveSelectedCoinData interestCoinDto.getCoin_name() : " + interestCoinDto.getCoin_name());
-            }
+            return Flux.fromIterable(interestCoinDtoList)
+                    .flatMap(interestCoin -> selectedCoinData(interestCoin.getCoin_name()))
+                    .then();  // 모든 작업이 완료된 후에 Mono<Void> 반환
         }
         return Mono.empty();
-
     }
 
 
