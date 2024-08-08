@@ -18,6 +18,26 @@ public class InterestCoinController {
     }
 
     /*
+     * 코인 데이터 모두 불러오기
+     * */
+    @GetMapping("/getAll-coin")
+    public List<InterestCoinDto> getCoinInfoAll(){
+        return coinInfoService.getAllInterestCoinData();
+    }
+
+
+    /*
+     * 관심있는 코인 데이터 선택/취소
+     * */
+    @PutMapping("/update-coin")
+//    @ResponseBody
+    public void putCoinInfo(@RequestBody InterestCoinDto interestCoinDto){
+        coinInfoService.updateInterestCoinData(interestCoinDto);
+    }
+
+
+
+    /*
      * WebClient 사용, 전체데이터 호출(테스트용)
      * */
     @GetMapping("/webclient-test")
@@ -61,14 +81,7 @@ public class InterestCoinController {
     }
 
 
-    /*
-     * 관심있는 코인 데이터 선택/취소
-     * */
-    @PutMapping("/update-coin")
-//    @ResponseBody
-    public void putCoinInfo(@RequestBody InterestCoinDto interestCoinDto){
-        coinInfoService.updateInterestCoinData(interestCoinDto);
-    }
+
 
 
 
@@ -84,13 +97,7 @@ public class InterestCoinController {
 //        coinInfoService.insertCoinInfo(interestCoinDto);
 //    }
 
-    /*
-     * 코인 데이터 모두 불러오기
-     * */
-    @GetMapping("/getAll-coin")
-    public List<InterestCoinDto> getCoinInfoAll(){
-        return coinInfoService.getAllInterestCoinData();
-    }
+
 
 
 
