@@ -16,17 +16,28 @@ import retrofit2.http.Path
 
 interface SpringApi {
 
+    /*
+    * SpingBoot + MySQL 서버에 있는 데이터 모두 불러오기
+    * */
     @GET("/getAll-coin")
-//    fun getAllInterestCoinData() : LiveData<List<InterestCoinDto>>
-    suspend fun getAllInterestCoinData() : LiveData<List<InterestCoinDto>>
+    suspend fun getAllInterestCoinData() : List<InterestCoinDto>
+
+    /*
+    * SpingBoot + MySQL 서버에 있는 데이터 selected 컬럼 update
+    * */
+    @PUT("/update-coin")
+    fun updateInterestCoinData(@Body interestCoinDto: InterestCoinDto) : Call<ResponseBody>
+
+
+
+
+
 
 
     @POST("/save-coin")
     fun insertInterestCoinData(@Body interestCoinDto: InterestCoinDto) : Call<ResponseBody>
 //    fun insertInterestCoinData(@Body interestCoinDto: InterestCoinDto?) : Call<ResponseBody?>?
 
-    @PUT("/update-coin")
-    fun updateInterestCoinData(@Body interestCoinDto: InterestCoinDto) : Call<ResponseBody>
 
 
     @POST("/save-price")

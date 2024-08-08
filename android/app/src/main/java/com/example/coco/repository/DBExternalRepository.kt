@@ -10,16 +10,24 @@ import com.example.coco.network.SpringApi
 class DBExternalRepository {
     private val client = RetrofitClient.getInstance().create(SpringApi::class.java)
 
-    // 전체 코인 데이터 가져오기
-//    suspend fun getAllInterestCoinData() = client.getAllInterestCoinData()
+    /*
+    * SpingBoot + MySQL 서버에 있는 데이터 모두 불러오기
+    * */
     suspend fun getAllInterestCoinData() = client.getAllInterestCoinData()
+
+    /*
+    * SpingBoot + MySQL 서버에 있는 데이터 selected 컬럼 update
+    * */
+    fun updateInterestCoinData(interestCoinDto: InterestCoinDto) = client.updateInterestCoinData(interestCoinDto)
+
+
+
+
 
     // 코인 데이터 넣기
     fun insertInterestCoinData(interestCoinDto: InterestCoinDto) = client.insertInterestCoinData(interestCoinDto)
 
-    // 코인 데이터 업데이트
-//    fun updateInterestCoinData(interestCoinEntity: InterestCoinEntity) = db.interestCoinDAO().update(interestCoinEntity)
-    fun updateInterestCoinData(interestCoinDto: InterestCoinDto) = client.updateInterestCoinData(interestCoinDto)
+
     
     // 코인 가격 데이터 저장하기
     fun insertSelectedCoinPrice(selectedCoinPriceDto: SelectedCoinPriceDto) = client.insertSelectedCoinPrice(selectedCoinPriceDto)
