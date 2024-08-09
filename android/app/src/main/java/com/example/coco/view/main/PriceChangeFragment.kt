@@ -38,7 +38,8 @@ class PriceChangeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        
+        // selected 코인 데이터 전체 호출
         viewModel.getAllSelectedCoinData()
 
         viewModel.arr15min.observe(viewLifecycleOwner, Observer {

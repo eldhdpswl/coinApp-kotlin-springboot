@@ -50,16 +50,13 @@ class MainViewModel : ViewModel() {
 
     // CoinListFragment
 
+    // 코인 전체 데이터 호출하는 로직(roomDB에 있는 데이터 호출)
     fun getAllInterestCoinData() = viewModelScope.launch {
 
         // roomDB 사용할때
         val coinList = dbRepository.getAllInterestCoinData().asLiveData()
-
-        // SpringBoot + MySQL 사용할때
-//        val coinList = dbExternalRepository.getAllInterestCoinData().asLiveData()
-//        val coinList = dbExternalRepository.getAllInterestCoinData()
+        
         selectCoinList = coinList
-
 
     }
 
@@ -76,11 +73,12 @@ class MainViewModel : ViewModel() {
 
         dbRepository.updateInterestCoinData(interestCoinEntity)
 
-        // SpringBoot + MySQL 사용할때
+        // SpringBoot + MySQL 사용
         var call: Call<ResponseBody>
 
         val interestCoinDto = interestCoinEntity.toDto()
 
+        // 좋아요 클릭한 코인 데이터 selected 컬럼 update 처리
         call = dbExternalRepository.updateInterestCoinData(interestCoinDto)
         call.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
@@ -94,22 +92,6 @@ class MainViewModel : ViewModel() {
         })
 
     }
-
-    // 관심있는 코인 선택 해제 기능 (SpringBoot + MySQL 사용할때)
-//    fun updateInterestCoinDataExternel(interestCoinDto: InterestCoinDto) = viewModelScope.launch(Dispatchers.IO) {
-//
-//        var call: Call<ResponseBody>
-//
-//        if(interestCoinDto.selected) {
-//            interestCoinDto.selected = false
-//        } else {
-//            interestCoinDto.selected = true
-//        }
-//
-//        dbExternalRepository.updateInterestCoinData(interestCoinDto)
-//
-//    }
-
 
     // PriceChangeFragment
     // 1. 관심있다고 선택한 코인 리스트를 가져와서
