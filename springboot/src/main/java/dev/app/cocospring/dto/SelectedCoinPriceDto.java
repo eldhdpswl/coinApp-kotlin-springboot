@@ -21,8 +21,8 @@ public class SelectedCoinPriceDto {
     private String total;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonSerialize(using = JsonDateSerializerAndDeserializer.Serializer.class)
-    @JsonDeserialize(using = JsonDateSerializerAndDeserializer.Deserializer.class)
+//    @JsonSerialize(using = JsonDateSerializerAndDeserializer.Serializer.class)
+//    @JsonDeserialize(using = JsonDateSerializerAndDeserializer.Deserializer.class)
     private Date timeStamp;
 
 

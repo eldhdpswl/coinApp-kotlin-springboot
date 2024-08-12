@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +19,37 @@ import java.text.SimpleDateFormat;
 public class SelectedCoinPriceService {
 
     private final SelectedCoinPriceRepository selectedCoinPriceRepository;
+
+    /*
+     * 누적된 코인 가격 데이터 호출
+     * */
+    public List<SelectedCoinPriceDto> getRecentCoinPriceData(Date lastTimeStamp){
+//        List<SelectedCoinPriceEntity> entityList = selectedCoinPriceRepository.findByCoinNameAndTimeStampGreaterThan(coinName, lastTimeStamp);
+        List<SelectedCoinPriceEntity> entityList = selectedCoinPriceRepository.findByTimeStampGreaterThan(lastTimeStamp);
+        return entityList.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    /*
+    * SelectedCoinPriceEntity 데이터 SelectedCoinPriceDto로 변환
+    * */
+    private SelectedCoinPriceDto convertToDto(SelectedCoinPriceEntity entity){
+        return SelectedCoinPriceDto.builder()
+                .id(entity.getId())
+                .coinName(entity.getCoinName())
+                .transaction_date(entity.getTransactionDate())
+                .type(entity.getType())
+                .units_traded(entity.getUnitsTraded())
+                .price(entity.getPrice())
+                .total(entity.getTotal())
+                .timeStamp(entity.getTimeStamp())
+                .build();
+
+    }
+
+
+
 
     /*
      * 관심있는 코인 데이터의 가격 정보 저장

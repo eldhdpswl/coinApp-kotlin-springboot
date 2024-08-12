@@ -43,8 +43,8 @@ public class SelectedCoinPriceEntity {
 
     @Column(name = "timeStamp")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonSerialize(using = JsonDateSerializerAndDeserializer.Serializer.class)
-    @JsonDeserialize(using = JsonDateSerializerAndDeserializer.Deserializer.class)
+//    @JsonSerialize(using = JsonDateSerializerAndDeserializer.Serializer.class)
+//    @JsonDeserialize(using = JsonDateSerializerAndDeserializer.Deserializer.class)
     private Date timeStamp;
 
 //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
