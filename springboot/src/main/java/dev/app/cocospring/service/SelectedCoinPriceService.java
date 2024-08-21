@@ -4,6 +4,7 @@ import dev.app.cocospring.dto.SelectedCoinPriceDto;
 import dev.app.cocospring.entity.SelectedCoinPriceEntity;
 import dev.app.cocospring.repository.SelectedCoinPriceRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class SelectedCoinPriceService {
@@ -21,15 +23,27 @@ public class SelectedCoinPriceService {
     private final SelectedCoinPriceRepository selectedCoinPriceRepository;
 
     /*
-     * 누적된 코인 가격 데이터 호출
+     * 누적된 코인 가격 데이터 호출 param lastTimestamp
      * */
     public List<SelectedCoinPriceDto> getRecentCoinPriceData(Date lastTimeStamp){
 //        List<SelectedCoinPriceEntity> entityList = selectedCoinPriceRepository.findByCoinNameAndTimeStampGreaterThan(coinName, lastTimeStamp);
+        log.info("SelectedCoinPriceService - getRecentCoinPriceData - lastTimeStamp : " + lastTimeStamp);
         List<SelectedCoinPriceEntity> entityList = selectedCoinPriceRepository.findByTimeStampGreaterThan(lastTimeStamp);
         return entityList.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
+
+    /*
+     * 누적된 코인 가격 데이터 호출, 처음 호출할때 사용, 모든 데이터 호출
+     * */
+    public List<SelectedCoinPriceDto> getRecentAllPriceData(){
+        List<SelectedCoinPriceEntity> entityAllList = selectedCoinPriceRepository.findAll();
+        return entityAllList.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
 
     /*
     * SelectedCoinPriceEntity 데이터 SelectedCoinPriceDto로 변환
@@ -54,25 +68,25 @@ public class SelectedCoinPriceService {
     /*
      * 관심있는 코인 데이터의 가격 정보 저장
      * */
-    @Transactional
-    public void insertSelectedCoinPrice(SelectedCoinPriceDto dto){
-        SelectedCoinPriceEntity selectedCoinPriceEntity = new SelectedCoinPriceEntity();
-
-//        DateFormat dateFomatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        selectedCoinPriceEntity.selectedCoinPrice(
-                dto.getId(),
-                dto.getCoinName(),
-                dto.getTransaction_date(),
-                dto.getType(),
-                dto.getUnits_traded(),
-                dto.getPrice(),
-                dto.getTotal(),
-                dto.getTimeStamp()
-
-        );
-        selectedCoinPriceRepository.save(selectedCoinPriceEntity);
-
-    }
+//    @Transactional
+//    public void insertSelectedCoinPrice(SelectedCoinPriceDto dto){
+//        SelectedCoinPriceEntity selectedCoinPriceEntity = new SelectedCoinPriceEntity();
+//
+////        DateFormat dateFomatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        selectedCoinPriceEntity.selectedCoinPrice(
+//                dto.getId(),
+//                dto.getCoinName(),
+//                dto.getTransaction_date(),
+//                dto.getType(),
+//                dto.getUnits_traded(),
+//                dto.getPrice(),
+//                dto.getTotal(),
+//                dto.getTimeStamp()
+//
+//        );
+//        selectedCoinPriceRepository.save(selectedCoinPriceEntity);
+//
+//    }
 
 
 }
