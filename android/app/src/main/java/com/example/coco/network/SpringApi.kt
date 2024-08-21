@@ -12,6 +12,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Query
 import retrofit2.http.Path
 
 interface SpringApi {
@@ -19,15 +20,26 @@ interface SpringApi {
     /*
     * SpingBoot + MySQL 서버에 있는 데이터 모두 불러오기
     * */
-    @GET("/getAll-coin")
+    @GET("getAll-coin")
     suspend fun getAllInterestCoinData() : List<InterestCoinDto>
 
     /*
     * SpingBoot + MySQL 서버에 있는 데이터 selected 컬럼 update
     * */
-    @PUT("/update-coin")
+    @PUT("update-coin")
     fun updateInterestCoinData(@Body interestCoinDto: InterestCoinDto) : Call<ResponseBody>
 
+    /*
+    * SpingBoot + MySQL 서버에 있는 누적된 코인 가격 데이터 호출, param lastTimestamp
+    * */
+    @GET("getRecentPriceData")
+    suspend fun getRecentPriceData(@Query("lastTimestamp") lastTimestamp: String) : List<SelectedCoinPriceDto>
+
+    /*
+    * SpingBoot + MySQL 서버에 있는 누적된 코인 가격 데이터 호출, 처음 호출할때 사용, 모든 데이터 호출
+    * */
+    @GET("getRecentAllPriceData")
+    suspend fun getRecentPriceAllData() : List<SelectedCoinPriceDto>
 
 
 

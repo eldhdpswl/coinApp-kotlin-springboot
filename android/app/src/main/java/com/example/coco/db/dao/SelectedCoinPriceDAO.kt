@@ -9,6 +9,10 @@ import com.example.coco.db.entity.SelectedCoinPriceEntity
 @Dao
 interface SelectedCoinPriceDAO {
 
+    // 코인 가격 데이터의 최신 timestamp 가져오기
+    @Query("SELECT * FROM selected_coin_price_table ORDER BY timeStamp DESC LIMIT 1")
+    fun getLastData() : SelectedCoinPriceEntity?
+
     // getAllData
     @Query("SELECT * FROM selected_coin_price_table")
     fun getAllData() : List<SelectedCoinPriceEntity>
