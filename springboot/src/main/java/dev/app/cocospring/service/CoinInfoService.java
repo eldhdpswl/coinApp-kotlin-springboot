@@ -45,18 +45,7 @@ public class CoinInfoService {
 //    }
 
     /*
-    * webClient 코인 전체데이터 호출
-    * */
-    public Mono<GetCoinInfo> getCoindData() {
-        return webClient.get()
-                .uri("/public/ticker/ALL")
-                .retrieve()
-                .bodyToMono(GetCoinInfo.class);
-
-    }
-
-    /*
-     * webClient 코인 전체데이터 저장
+     * post 전체데이터 호출하고 테이블에 저장(WebClient)
      * */
     public Mono<Void> saveCoinDate() {
         return webClient.get()
@@ -75,61 +64,6 @@ public class CoinInfoService {
                     return Mono.empty();
                 });
     }
-
-    /*
-     * webClient Selected 코인 최신 거래 데이터 저장
-     * */
-    public Mono<Void> selectedCoinData(String coinName){
-        String url = "public/transaction_history/" + coinName + "_KRW";
-        log.info("coinName : " + coinName);
-
-        return webClient.get()
-                .uri(url)
-                .retrieve()
-                .bodyToMono(Map.class)
-                .flatMap(response ->{
-                    // 코인 거래 데이터 가져와서 List로 담기
-                    List<Map<String, String>> dataList = (List<Map<String, String>>) response.get("data");
-                    Map<String, String> recentData = dataList.get(0); // 최신 거래 데이터
-
-                    SelectedCoinPriceEntity entity = new SelectedCoinPriceEntity();
-                    try{
-                        entity.selectedCoinPrice(
-                                null,
-                                coinName,
-                                recentData.get("transaction_date"),
-                                recentData.get("type"),
-                                recentData.get("units_traded"),
-                                recentData.get("price"),
-                                recentData.get("total"),
-                                DateUtil.convertStringToDate(DateUtil.getCurrentTimestamp())
-                        );
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                        return Mono.error(e);
-                    }
-                    log.info("Saving entity: " + entity);
-                    selectedCoinPriceRepository.save(entity);
-
-                    return Mono.empty();
-
-                });
-    }
-
-    /*
-     * webClient Selected 코인 데이터를 모두 불러와서 최신 거래 데이터 저장
-     * */
-    public Mono<Void> saveSelectedCoinData(){
-        List<InterestCoinDto> interestCoinDtoList = getAllInterestSelectedCoinData(); // selected True 데이터 호출
-        if (interestCoinDtoList != null && !interestCoinDtoList.isEmpty()) {
-            return Flux.fromIterable(interestCoinDtoList)
-                    .flatMap(interestCoin -> selectedCoinData(interestCoin.getCoin_name()))
-                    .then();  // 모든 작업이 완료된 후에 Mono<Void> 반환
-        }
-        return Mono.empty();
-    }
-
-
 
     /*
      * Map을 InterestCoinDto로 변환
@@ -175,34 +109,9 @@ public class CoinInfoService {
         return entity;
     }
 
-    /*
-     * 코인정보 저장
-     * */
-    @Transactional
-    public void insertCoinInfo(InterestCoinDto dto){
-        InterestCoinEntity interestCoinEntity = new InterestCoinEntity();
-        interestCoinEntity.insertCoinInfo(
-                dto.getId(),
-                dto.getCoin_name(),
-                dto.getOpening_price(),
-                dto.getClosing_price(),
-                dto.getMin_price(),
-                dto.getMax_price(),
-                dto.getUnits_traded(),
-                dto.getAcc_trade_value(),
-                dto.getPrev_closing_price(),
-                dto.getUnits_traded_24H(),
-                dto.getAcc_trade_value_24H(),
-                dto.getFluctate_24H(),
-                dto.getFluctate_rate_24H(),
-                dto.getSelected()
-        );
-        coinInfoRepository.save(interestCoinEntity);
-
-    }
 
     /*
-     * 모든 코인정보 불러오기
+     * 코인 데이터 모두 불러오기
      * */
     public List<InterestCoinDto> getAllInterestCoinData(){
         List<InterestCoinEntity> interestCoinEntityList = coinInfoRepository.findAll();
@@ -210,30 +119,6 @@ public class CoinInfoService {
         return interestCoinEntityList.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
-    }
-
-    /*
-     * 코인 데이터 업데이트
-     * */
-    @Transactional
-    public void updateInterestCoinData(InterestCoinDto dto) {
-        Optional<InterestCoinEntity> targetEntity = coinInfoRepository.findByCoinName(dto.getCoin_name());
-        InterestCoinEntity interestCoinEntity = targetEntity.get();
-
-        // selected 값 변경
-        interestCoinEntity.changeSelected(dto.getSelected());
-    }
-
-    /*
-     * 사용자가 관심있어하는 코인만 가져오기
-     * */
-    public List<InterestCoinDto> getAllInterestSelectedCoinData(){
-        List<InterestCoinEntity> selectedCoinEntityList = coinInfoRepository.findBySelectedTrue();
-
-        return selectedCoinEntityList.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-
     }
 
     /*
@@ -257,5 +142,131 @@ public class CoinInfoService {
                 .selected(entity.getSelected())
                 .build();
     }
+
+
+    /*
+     * 코인 데이터 업데이트
+     * */
+    @Transactional
+    public void updateInterestCoinData(InterestCoinDto dto) {
+        Optional<InterestCoinEntity> targetEntity = coinInfoRepository.findByCoinName(dto.getCoin_name());
+        InterestCoinEntity interestCoinEntity = targetEntity.get();
+
+        // selected 값 변경
+        interestCoinEntity.changeSelected(dto.getSelected());
+    }
+
+
+
+    /*
+     * Selected 코인 데이터를 모두 불러와서 최신 거래 데이터 저장 (Scheduler에서 사용)
+     * */
+    public Mono<Void> saveSelectedCoinData(){
+        List<InterestCoinDto> interestCoinDtoList = getAllInterestSelectedCoinData(); // selected True 데이터 호출
+        if (interestCoinDtoList != null && !interestCoinDtoList.isEmpty()) {
+            return Flux.fromIterable(interestCoinDtoList)
+                    .flatMap(interestCoin -> selectedCoinData(interestCoin.getCoin_name()))
+                    .then();  // 모든 작업이 완료된 후에 Mono<Void> 반환
+        }
+        return Mono.empty();
+    }
+
+
+
+    /*
+     * selected 코인 최신 거래 데이터 저장 (Scheduler에서 사용)
+     * */
+    public Mono<Void> selectedCoinData(String coinName){
+        String url = "public/transaction_history/" + coinName + "_KRW";
+        log.info("coinName : " + coinName);
+
+        return webClient.get()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .flatMap(response ->{
+                    // 코인 거래 데이터 가져와서 List로 담기
+                    List<Map<String, String>> dataList = (List<Map<String, String>>) response.get("data");
+                    Map<String, String> recentData = dataList.get(0); // 최신 거래 데이터
+
+                    SelectedCoinPriceEntity entity = new SelectedCoinPriceEntity();
+                    try{
+                        entity.selectedCoinPrice(
+                                null,
+                                coinName,
+                                recentData.get("transaction_date"),
+                                recentData.get("type"),
+                                recentData.get("units_traded"),
+                                recentData.get("price"),
+                                recentData.get("total"),
+                                DateUtil.convertStringToDate(DateUtil.getCurrentTimestamp())
+                        );
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        return Mono.error(e);
+                    }
+                    log.info("Saving entity: " + entity);
+                    selectedCoinPriceRepository.save(entity);
+
+                    return Mono.empty();
+
+                });
+    }
+
+
+
+    /*
+     * 사용자가 관심있어하는 코인만 가져오기
+     * */
+    public List<InterestCoinDto> getAllInterestSelectedCoinData(){
+        List<InterestCoinEntity> selectedCoinEntityList = coinInfoRepository.findBySelectedTrue();
+
+        return selectedCoinEntityList.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+
+    }
+
+
+
+    /*
+     * 전체데이터 호출(WebClient 사용 & 테스트용)
+     * */
+    public Mono<GetCoinInfo> getCoindData() {
+        return webClient.get()
+                .uri("/public/ticker/ALL")
+                .retrieve()
+                .bodyToMono(GetCoinInfo.class);
+
+    }
+
+
+
+    /*
+     * 코인정보 저장
+     * */
+//    @Transactional
+//    public void insertCoinInfo(InterestCoinDto dto){
+//        InterestCoinEntity interestCoinEntity = new InterestCoinEntity();
+//        interestCoinEntity.insertCoinInfo(
+//                dto.getId(),
+//                dto.getCoin_name(),
+//                dto.getOpening_price(),
+//                dto.getClosing_price(),
+//                dto.getMin_price(),
+//                dto.getMax_price(),
+//                dto.getUnits_traded(),
+//                dto.getAcc_trade_value(),
+//                dto.getPrev_closing_price(),
+//                dto.getUnits_traded_24H(),
+//                dto.getAcc_trade_value_24H(),
+//                dto.getFluctate_24H(),
+//                dto.getFluctate_rate_24H(),
+//                dto.getSelected()
+//        );
+//        coinInfoRepository.save(interestCoinEntity);
+//
+//    }
+
 
 }

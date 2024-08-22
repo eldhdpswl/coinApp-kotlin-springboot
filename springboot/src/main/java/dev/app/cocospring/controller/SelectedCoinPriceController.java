@@ -39,11 +39,6 @@ public class SelectedCoinPriceController {
         return selectedCoinPriceService.getRecentCoinPriceData(parsedDate);
     }
 
-//    @GetMapping("/getRecentPriceData")
-//    public List<SelectedCoinPriceDto> getRecentPriceData(
-//            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date lastTimestamp){
-//        return selectedCoinPriceService.getRecentCoinPriceData(lastTimestamp);
-//    }
 
     /*
     * 누적된 코인 가격 데이터 호출, 처음 호출할때 사용, 모든 데이터 호출
@@ -54,9 +49,17 @@ public class SelectedCoinPriceController {
         return selectedCoinPriceService.getRecentAllPriceData();
     }
 
-    
-    
-    
+
+
+
+
+    //    @GetMapping("/getRecentPriceData")
+//    public List<SelectedCoinPriceDto> getRecentPriceData(
+//            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date lastTimestamp){
+//        return selectedCoinPriceService.getRecentCoinPriceData(lastTimestamp);
+//    }
+
+
     /*
      * 관심있는 코인 데이터의 가격 정보 저장
      * */

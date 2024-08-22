@@ -17,6 +17,16 @@ public class InterestCoinController {
         this.coinInfoService = coinInfoService;
     }
 
+
+    /*
+     * post 전체데이터 호출하고 테이블에 저장(WebClient)
+     * */
+    @PostMapping("/save-CoinInfo")
+    public Mono<Void> saveCoinInfo(){
+        return coinInfoService.saveCoinDate();
+    }
+
+
     /*
      * 코인 데이터 모두 불러오기
      * */
@@ -27,7 +37,7 @@ public class InterestCoinController {
 
 
     /*
-     * 관심있는 코인 데이터 선택/취소
+     * 관심있는 코인 데이터 selected 선택/취소
      * */
     @PutMapping("/update-coin")
 //    @ResponseBody
@@ -37,8 +47,13 @@ public class InterestCoinController {
 
 
 
+
+
+
+
+
     /*
-     * WebClient 사용, 전체데이터 호출(테스트용)
+     * 전체데이터 호출(WebClient 사용 & 테스트용)
      * */
     @GetMapping("/webclient-test")
     @ResponseBody
@@ -46,17 +61,10 @@ public class InterestCoinController {
         return coinInfoService.getCoindData();
     }
 
-    /*
-     * WebClient 사용 post 전체데이터 호출하고 테이블에 저장(수정필요)
-     * */
-    @PostMapping("/webclient-saveCoinInfo")
-    public Mono<Void> saveCoinInfo(){
-        return coinInfoService.saveCoinDate();
-    }
 
 
     /*
-     * WebClient selected 코인 최신 거래 데이터 저장(테스트용)
+     * selected 코인 최신 거래 데이터 저장(WebClient 사용 & 테스트용)
      * */
     @PostMapping("/webclient-testSelectedPost/{coinName}")
     public Mono<Void> selectedCoinInfo(@PathVariable String coinName){
@@ -64,7 +72,7 @@ public class InterestCoinController {
     }
 
     /*
-    * WebClient selected 코인 전체 데이터 최근 거래 내역 저장
+    * selected 코인 전체 데이터 최근 거래 내역 저장 (WebClient 사용 & scheduler 테스트용)
     * */
     @PostMapping("/webclient-saveSelectedCoinPrice")
     public Mono<Void> saveSelectedCoinPrice(){
@@ -73,7 +81,7 @@ public class InterestCoinController {
 
 
     /*
-     * 관심있는 코인 데이터 모두 불러오기
+     * 관심있는 코인 데이터 모두 불러오기  (테스트용)
      * */
     @GetMapping("/getSelectedAll-coin")
     public List<InterestCoinDto> getSelectedCoinInfoAll(){
