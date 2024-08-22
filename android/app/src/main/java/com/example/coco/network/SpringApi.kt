@@ -46,14 +46,14 @@ interface SpringApi {
 
 
 
-    @POST("/save-coin")
-    fun insertInterestCoinData(@Body interestCoinDto: InterestCoinDto) : Call<ResponseBody>
+//    @POST("/save-coin")
+//    fun insertInterestCoinData(@Body interestCoinDto: InterestCoinDto) : Call<ResponseBody>
 //    fun insertInterestCoinData(@Body interestCoinDto: InterestCoinDto?) : Call<ResponseBody?>?
 
 
 
-    @POST("/save-price")
-    fun insertSelectedCoinPrice(@Body selectedCoinPriceDto: SelectedCoinPriceDto) : Call<ResponseBody>
+//    @POST("/save-price")
+//    fun insertSelectedCoinPrice(@Body selectedCoinPriceDto: SelectedCoinPriceDto) : Call<ResponseBody>
 
 
     // getCurerentCoinList를 repository에서 Api 호출을 관리할라고 한다.

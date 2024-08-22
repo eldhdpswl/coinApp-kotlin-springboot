@@ -34,14 +34,17 @@ class DBExternalRepository {
     suspend fun getRecentPriceAllData() = client.getRecentPriceAllData()
 
 
+
+
+
+
+
     // 코인 데이터 넣기
-    fun insertInterestCoinData(interestCoinDto: InterestCoinDto) = client.insertInterestCoinData(interestCoinDto)
+//    fun insertInterestCoinData(interestCoinDto: InterestCoinDto) = client.insertInterestCoinData(interestCoinDto)
 
 
     // 코인 가격 데이터 저장하기
-    fun insertSelectedCoinPrice(selectedCoinPriceDto: SelectedCoinPriceDto) = client.insertSelectedCoinPrice(selectedCoinPriceDto)
-
-
+//    fun insertSelectedCoinPrice(selectedCoinPriceDto: SelectedCoinPriceDto) = client.insertSelectedCoinPrice(selectedCoinPriceDto)
 
 
 
