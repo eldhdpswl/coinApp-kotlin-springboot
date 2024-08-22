@@ -5,8 +5,8 @@ server:
 
 spring:
   profiles:
-#    active: test
-    active: local
+#    active: local
+    active: aws
 
   mvc:
     pathmatch:

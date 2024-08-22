@@ -25,7 +25,12 @@ class DBRepository {
     fun getAllInterestSelectedCoinData() = db.interestCoinDAO().getSelectedData()
 
 
+
+
     // CoinPrice
+
+    // 코인 가격 데이터중 최신 데이터만 호출
+    fun getLastCoinPriceData(): SelectedCoinPriceEntity? = db.selectedCoinDAO().getLastData()
 
     fun getAllCoinPriceData() = db.selectedCoinDAO().getAllData()
 

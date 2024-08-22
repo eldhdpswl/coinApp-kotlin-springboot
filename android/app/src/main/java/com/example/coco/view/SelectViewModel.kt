@@ -47,19 +47,22 @@ class SelectViewModel : ViewModel() {
     // 데이터 가공 작업
     fun getCurrentCoinList() = viewModelScope.launch {
 
-        val result = netWorkRepository.getCurrentCoinList()
+        // roomdb
+//        val result = netWorkRepository.getCurrentCoinList()
+
+        val resultAllCoin = dbExternalRepository.getAllInterestCoinData()
 
         currentPriceResultList = ArrayList()
 
-        for(coin in result.data) {
-
+//        for(coin in result.data) {
+        for(coin in resultAllCoin) {
             // 원하는 데이터 포맷이 아닐때를 해결하기 위해 예외처리
             try{
                 val gson = Gson()
-                val gsonToJson = gson.toJson(result.data.get(coin.key))
+                val gsonToJson = gson.toJson(coin)
                 val gsonFromJson = gson.fromJson(gsonToJson, CurrentPrice::class.java)
 
-                val currentPriceResult = CurrentPriceResult(coin.key, gsonFromJson)
+                val currentPriceResult = CurrentPriceResult(coin.coin_name, gsonFromJson)
 
                 currentPriceResultList.add(currentPriceResult)
 
@@ -115,8 +118,9 @@ class SelectViewModel : ViewModel() {
             interestCoinEntity.let {
                 dbRepository.insertInterestCoinData(it)
             }
-            
-            // Dto에 담기  SpringBoot + MySQL 사용할때
+
+
+            // Dto에 담기  SpringBoot + MySQL 사용(서버에 이미 저장된 데이터에 selected 컬럼 업데이트)
             val interestCoinDto = InterestCoinDto(
                 0,
                 coin.coinName,
@@ -134,9 +138,9 @@ class SelectViewModel : ViewModel() {
                 selected
             )
 
-            // 3. 저장   SpringBoot + MySQL 사용할때
+            // 3. 저장   SpringBoot + MySQL 사용(서버에 이미 저장된 데이터에 selected 컬럼 업데이트)
             interestCoinDto.let {
-                call = dbExternalRepository.insertInterestCoinData(it)
+                call = dbExternalRepository.updateInterestCoinData(it)
                 call.enqueue(object : Callback<ResponseBody>{
                     override fun onResponse(
                         call: Call<ResponseBody>,
