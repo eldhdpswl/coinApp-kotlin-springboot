@@ -34,8 +34,9 @@ COCO는 Android(Kotlin)와 Spring Boot를 사용하여 개발된 암호화폐 �
 
 - VM: OpenJDK 64-Bit Server
 
-> **(2) Android Language**
+> **(2) Android Language & Database**
 - Kotlin version : 1.9.0
+- RoomDB version : 2.4.1
 
 > **(3) AVD(Android Virtual Device)**
 - AVD displayname : Pixel_3a_API_34_extension_level_7_x86_64
@@ -46,12 +47,14 @@ COCO는 Android(Kotlin)와 Spring Boot를 사용하여 개발된 암호화폐 �
 - IntelliJ | 3.2.2
     - 설치 URL : https://www.jetbrains.com/ko-kr/idea/
 
-> **(5) Spring Boot Language**
+> **(5) Spring Boot Language & Database**
 - JAVA version : 17.0.10
 - OpenJDK 64-Bit
+- MySQL version : 8.0.36
 
-> **(6) MySQL**
-- MySQL : 8.0.36
+> **(6) AWS**
+- EC2 Instance : t2.micro (Ubuntu 24.04)
+- RDS Instance : t3.micro (MySQL 8.0.36)
 
 
 ## 5. Project Structure
@@ -60,25 +63,27 @@ COCO는 Android(Kotlin)와 Spring Boot를 사용하여 개발된 암호화폐 �
 ```bash
 src
 ├── App.kt   // Android App 메인 클래스
-├── background   
-├── dataModel
-├── dataStore
+├── background   // 백그라운드 작업 처리 
+│   ├── GetCoinPriceRecentContractedWorkManager.kt  // 최근 거래된 코인 가격 내역을 가져오는 WorkManager
+├── dataModel  // 데이터 모델 클래스 (데이터 구조 정의)
+├── dataStore  // 사용자가 앱에 처음 접속했는지 여부를 관리
 ├── db
-│   ├── dao
-│   └── entity
+│   ├── dao   // 데이터 접근 객체(DAO) 인터페이스
+│   └── entity   // 데이터베이스 Entity 클래스 (RoomDB 테이블과 매핑)
 ├── network
-│   └── model
-├── repository
-├── service
+│   └── model  // API 호출과 응답에 사용되는 데이터 모델
+├── receiver     // 기기 부팅시, 백그라운드에서 코인 가격 정보를 업데이트
+├── repository   // 데이터 처리 로직을 관리하는 repository
+├── service   // 코인 가격 정보를 가져와서 알림으로 표시
 └── view
-    ├── adapter
-    ├── intro
-    ├── main
-    └── setting
+    ├── adapter   // RecyclerView에서 사용되는 어댑터 클래스
+    ├── intro    // 인트로 화면 관련 UI 및 로직
+    ├── main    // 메인 화면 관련 UI 및 로직
+    └── setting  // notification 알림창 설정
 
 res   
 ├── drawble // app 화면 구성에 필요한 UI 이미지
-└── layout  // app 화면 리소스 파일   
+└── layout  // app 화면 레이아웃 리소스 파일 (XML 형식)
 ```
 
 
