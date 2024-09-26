@@ -115,19 +115,54 @@ src
 ```
 
 
-## 3. Components
-> **3-(1) Intro**
-- Splash 화면 구성
-  - IntroActivity.kt / IntroViewModel.kt
-  - activity_Intro.xml
-- 인트로 화면 구성
-  - IntroFragment1.kt / IntroFragment2.kt
-  - fragment_Intro1.xml / fragment_Intro2.xml
+## 6. Installation
 
+현재 사용료 문제로 ec2와 rds는 삭제한 상태입니다.
 
+> **6-(1) 애플리케이션 실행 순서**
 
+```bash
+(1) EC2 인스턴스에 접속
+ssh -i "sshKey.pem" ubuntu@ec2.ap-northeast-2.compute.amazonaws.com
 
-## 4. Workflow
+(2) git 설치, git clone
+sudo apt-get install git
+git clone https://github.com/eldhdpswl/coinApp-deploy.git
 
+(3) Java 17 설치
+sudo apt-get install openjdk-17-jdk
+sudo apt-get update
 
+(4) 빌드
+./gradlew clean build
+./gradlew clean build --no-daemon --refresh-dependencies // 빌드 실패했을 경우 캐시 삭제
+
+(5) 빌드 파일 실행
+cd build/libs
+nohup java -jar coco-spring-0.0.1-SNAPSHOT.jar &
+cat nohup.out   // log 확인용
+
+(6) 실행중인 jar 파일 중지할때
+jobs
+fg %1
+
+(7) schedule 기능을 위한 JVM 시간대 설정
+nohup java -Duser.timezone=Asia/Seoul -jar /path/to/your/app.jar &
+
+```
+
+> **6-(2) Spring Boot 애플리케이션 시간대 설정**
+
+application-aws.yml 설정 (schedule 기능을 위해 설정):
+```bash
+# 서버의 시간대를 설정
+server:
+  port: 8080
+  timezone: Asia/Seoul
+
+# JVM의 기본 시간대를 설정
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %5p %c{1}:%L - %m%n"
+```
 
